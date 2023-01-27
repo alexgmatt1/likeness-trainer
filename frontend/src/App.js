@@ -1,23 +1,35 @@
 import logo from './logo.svg';
 import './App.css';
+import React, { useEffect, useState } from "react";
+import {userService} from "./services/userService.ts"
+import ImageTable from "./Components/ImageTable/ImageTable"
 
 function App() {
+
+  const [images,setImages] = useState(null)
+
+  useEffect(() => {
+    const getImages = async () => {
+  const resp = await userService.getImages()
+  console.log(resp.images)
+  setImages(resp.images);
+}
+if (!images) {
+getImages()
+}}
+, [])
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <p> hello </p>
+      {images?
+      <ImageTable images = {images}/>
+      : <p>Loading...</p>}
+      }
+
+
+      
     </div>
   );
 }

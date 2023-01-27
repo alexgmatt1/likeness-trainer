@@ -1,6 +1,6 @@
-import {axiosRequest} from './request'
+import {axiosRequest} from './request.ts'
 
-const fetchImages = async () => {
+const getImages = async () => {
   try {
     const response = await axiosRequest.post('getImages')
     return response
@@ -8,3 +8,5 @@ const fetchImages = async () => {
     return error.response.data
   }
 }
+
+export const userService =  {getImages}

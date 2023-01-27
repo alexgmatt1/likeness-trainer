@@ -1,0 +1,25 @@
+.table {
+  
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  width:  70%;
+  justify-content: center;
+  align-content: center;
+
+
+}
+
+.table img {
+
+	max-height: 100px;
+	margin:  5px;
+
+
+}
+
+.mainTableBody {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
