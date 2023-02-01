@@ -30,9 +30,9 @@ const recoverVotes = async () => {
 }
 
 
-const addUser = async () => {
+const addUser = async (data) => {
   try {
-    const response = await axiosRequest.post('addUser')
+    const response = await axiosRequest.post('addUser', data)
     return response
   } catch (error) {
     return error.response.data

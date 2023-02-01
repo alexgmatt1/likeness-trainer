@@ -1,0 +1,30 @@
+
+
+.registerDiv {
+	height: 70vh;
+
+	background: white;
+	margin-top: 5rem;
+	width: 40vw;
+	background: rgba(217, 217, 217, 0.26);
+border-radius: 20px;
+display: flex;
+flex-direction:column;
+
+}
+
+.registerField {
+	display:flex;
+	margin: 2rem;
+	align-items:center;
+
+	h4 {
+	 margin: 1rem;
+	}
+}
+
+.rc-slider-handle:before {
+     content: attr(aria-valuenow);  // to display current value of slider
+     padding: 2rem;
+    /* style your tooltip */
+}
