@@ -1,0 +1,16 @@
+.loginDiv {
+	display:flex;
+	flex-direction:column;
+
+	h1 {
+	font-size:  100px;
+	color: var(--text-primary);
+	}
+}
+
+.loginButton {
+	display:flex;
+	
+	justify-content:flex-end;
+	width: 30%;
+}
