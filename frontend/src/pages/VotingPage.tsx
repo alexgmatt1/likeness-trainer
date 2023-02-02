@@ -26,12 +26,23 @@ const VotingPage = () => {
 	const [pageIdx,setPageIdx] = useState(0);
 	const [numCompletedVotes,setNumCompletedVotes] = useState(0)
 	const inputRef = useRef(null);
+	const [newUpdates, setNewUpdates] = useState(0)
+	const saveRate = 3 // save every 3 votes/updates
 
 	const voteImage = (choice) => {
 		console.log("vote")
 		let currentPair = votesToDo[pageIdx]
 		setNewVotes(currentPair,currentPair[choice === 'left' ? 0 : 1])
 		setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1))
+		setNewUpdates(newUpdates+1)
+	}
+
+	const saveData = () => {
+			let votedData = Object.entries(pairs2Votes).filter(([pair,vote]) => vote != null).map(([pair,vote]) => {
+
+				return [vote, pair.split(',').filter(fn => fn != vote)[0]]
+			})
+			console.log("saved", votedData)
 	}
 
 	ArrowKeysReact.config({
@@ -51,6 +62,10 @@ const VotingPage = () => {
 	    inputRef.current.focus();
 	  } , [pageIdx])
 
+    useEffect(() => {
+    	(newUpdates > 0 && newUpdates % saveRate == 0) && saveData()}
+    , [newUpdates])
+
 
 
 	const getUserVotes = async () => {
@@ -63,8 +78,9 @@ const VotingPage = () => {
 	}
 
 	const getAllPairs = async () => {
-		//const resp = await userService.getImages();
-		const allPairs = [["100_1_1.png","100_1_2.png"], ["100_1_1.png","100_1_3.png"], ["100_1_2.png","100_1_3.png"]]
+		const resp = await userService.getImages();
+		const allPairs = resp.images.map(triple => [triple[1],triple[2]])
+		//const allPairs = [["100_1_1.png","100_1_2.png"], ["100_1_1.png","100_1_3.png"], ["100_1_2.png","100_1_3.png"]]
 		return allPairs
 
 	}
@@ -229,11 +245,11 @@ const VotingPage = () => {
 				<h4> Original Image </h4>
 				</div>
 				<div className = {drawing1Style} >
-				<img onClick = {()=> {setNewVotes(currentPair,currentPair[0]); setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1))}} className = 'votingGrid__drawing' src = {drawing1}/>
+				<img onClick = {()=> {voteImage("left")}} className = 'votingGrid__drawing' src = {drawing1}/>
 				<h4> Drawing 1 </h4>
 				</div>
 				<div className = {`imgDiv ${currentVote === currentPair[1] && "drawingSelected"}`}>
-				<img onClick = {()=> {setNewVotes(currentPair,currentPair[1]); setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1))}}  className = 'votingGrid__drawing' src = {drawing2} />
+				<img onClick = {()=> {voteImage("right")}}  className = 'votingGrid__drawing' src = {drawing2} />
 				<h4> Drawing 2 </h4>
 				</div>
 
