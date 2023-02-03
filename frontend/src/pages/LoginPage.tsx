@@ -11,11 +11,18 @@ const LoginPage = () => {
 	const [username, setUsernameField] = useState('')
 	const navigate = useNavigate()
 	const dispatch = useAppDispatch()
+	const [isValidUsername,setIsValidUsername] = useState(true)
 
 	const login = async () => {
 		console.log(username)
 		//const resp = await userService.checkRegistered(username);
 		//const alreadyRegistered = resp.alreadyRegistered;
+		const valid = true;
+		setIsValidUsername(false);
+
+		if (!valid) {
+			return
+		}
 
 		dispatch(setUsername(username));
 
@@ -32,9 +39,11 @@ const LoginPage = () => {
 		<>
 		<section className = 'container loginDiv'>
 			<h1> Likeness Trainer </h1>
+			<h4> Please enter your access code </h4>
 			<div className = 'inputDiv'>
 			<InputText value = {username} setValue = {(e)=>setUsernameField(e.target.value)}/>
 			</div>
+			{!isValidUsername && <h4 className = 'error'> Access code does not exist! Please try again or get in contact </h4>}
 			<div className = 'loginButton'>
 				<button className = 'btn_primary' onClick = {()=> login()}> Log in </button>
 			</div>
