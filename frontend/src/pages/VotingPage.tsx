@@ -27,7 +27,8 @@ const VotingPage = () => {
 	const [numCompletedVotes,setNumCompletedVotes] = useState(0)
 	const inputRef = useRef(null);
 	const [newUpdates, setNewUpdates] = useState(0)
-	const saveRate = 3 // save every 3 votes/updates
+	const saveRate = 5 // save every 5 votes/updates
+	const [savedText,setSavedText] = useState(false)
 
 	const voteImage = (choice) => {
 		console.log("vote")
@@ -35,6 +36,9 @@ const VotingPage = () => {
 		setNewVotes(currentPair,currentPair[choice === 'left' ? 0 : 1])
 		setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1))
 		setNewUpdates(newUpdates+1)
+		if (savedText) {
+			setSavedText(false)
+		}
 	}
 
 	const saveData = () => {
@@ -43,6 +47,7 @@ const VotingPage = () => {
 				return [vote, pair.split(',').filter(fn => fn != vote)[0]]
 			})
 			console.log("saved", votedData)
+			setSavedText(true)
 	}
 
 	ArrowKeysReact.config({
@@ -255,7 +260,8 @@ const VotingPage = () => {
 
 			</div>
 			<div className = 'backButtonDiv'>
-			<button disabled = {!pageIdx} onClick = {()=>setPageIdx(Math.min(votesToDo.length - 1, pageIdx - 1))} className = 'btn_primary'> Previous </button>
+			<button disabled = {!pageIdx} onClick = {()=>setPageIdx(Math.max(0, pageIdx - 1))} className = 'btn_primary'> Previous </button>
+			<button disabled = {!pageIdx} onClick = {()=>setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1))} className = 'btn_primary'> Next </button>
 			<h5> Comparison: {pageIdx+1} / {votesToDo.length} </h5>
 			</div>
 			</>
@@ -274,6 +280,8 @@ const VotingPage = () => {
 			<div className = 'progressDiv'>
 			<ProgressBar labelClassName="label" bgColor = 'lightgreen' completed={Math.round(100*getNumCompletedVotes()/(votesToDo.length + userVotes.length))} />
 			<h4> Votes completed: {getNumCompletedVotes()} / {votesToDo.length + userVotes.length} </h4> 
+
+			{savedText && <h5> Autosaved! </h5>}
 			</div>
 			<h2> Select the drawing that you believe captures the most resemblance to the original image. </h2>
 			<h4> Press the left arrow key to select drawing 1, and the right arrow key for drawing 2. You can also use the mouse to select. </h4>
