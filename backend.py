@@ -23,6 +23,7 @@ def test():
 @app.route("/getImages", methods = ['POST'])
 @cross_origin()
 def getImages():
+  """ Returns json formatted list of image files {images: list(images)} """
   df = pd.read_csv("./frontend/public/assets/files.csv")
   print(df)
   return jsonify({"images": list(df.itertuples(index=False))})
@@ -30,15 +31,19 @@ def getImages():
 @app.route("/checkRegistered", methods = ['POST'])
 @cross_origin()
 def checkRegistered():
-  username = request.form['username']
+  """ Returns boolean true if username already exists in the username column of the users table, otherwise false """
+  form = request.get_json()
+  username = form['username']
   with dbm() as db:
     registered = db.user_exists(username)
-  return registered
+  return jsonify({"isRegistered": registered})
 
 @app.route("/recoverVotes", methods = ['POST'])
 @cross_origin()
 def recoverVotes():
-  username = request.form['username']
+  """ Returns json formatted list of votes that user has already made in database {votes: list((chosen, other), ...)} """
+  form = request.get_json()
+  username = form['username']
   with dbm() as db:
     votes = db.get_votes(username)
   return jsonify({"votes": list(votes)})
@@ -46,18 +51,22 @@ def recoverVotes():
 @app.route("/addUser", methods = ['POST'])
 @cross_origin()
 def addUserInfo():
-  username = request.form['username']
-  age = request.form['age']
-  gender = request.form['gender']
+  """ Adds new record to users table """
+  form = request.get_json()
+  username = form['username']
+  age = form['age']
+  gender = form['gender']
   with dbm() as db:
-    db.add_user(username, age, gender)
+    db.update_details(username, age, gender)
   return
 
 @app.route("/submitVotes", methods = ['POST'])
 @cross_origin()
 def submitVotes():
-  username = request.form['username']
-  votes = request.form['votes']
+  """ Adds record to votes table for each new vote the user has made """
+  form = request.get_json()
+  username = form['username']
+  votes = form['votes']
   with dbm() as db:
     for vote in votes:
       db.add_vote(username, vote[0], vote[1])

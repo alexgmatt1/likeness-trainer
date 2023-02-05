@@ -16,6 +16,10 @@ class DbManager:
         """ Adds vote to database """
         self.cursor.execute("INSERT INTO votes(username, chosen_image_filename, other_image_filename, timestamp) VALUES(%s,%s,%s,%s)",\
             (username, chosen_image_filename, other_image_filename, datetime.datetime()))
+        
+    def add_votes(self, username, votes):
+        """" Adds batch of votes to database with executemany """
+        
 
     def remove_vote(self, username, chosen_image_filename, other_image_filename):
         """ Removes vote from database"""
@@ -51,7 +55,7 @@ class DbManager:
         return (self.cursor.fetchone()[0] == 1)
     
     def update_details(self, username, age, gender):
-        """"""
+        """ Update record on  """
         self.cursor.execute("UPDATE users SET age=%s WHERE username=%s",\
             (age, username))
         self.cursor.execute("UPDATE users SET gender=%s WHERE username=%s",\
