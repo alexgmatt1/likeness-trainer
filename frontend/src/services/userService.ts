@@ -12,7 +12,7 @@ const getImages = async () => {
 
 const checkRegistered = async (username) => {
   try {
-    const response = await axiosRequest.get('checkRegistered', {username})
+    const response = await axiosRequest.post('checkRegistered', {username})
     return response
   } catch (error) {
     return error.response.data

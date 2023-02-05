@@ -55,10 +55,10 @@ def addUserInfo():
   form = request.get_json()
   username = form['username']
   age = form['age']
-  gender = form['gender']
+  gender = form['gender'].capitalize()
   with dbm() as db:
     db.update_details(username, age, gender)
-  return
+  return jsonify({"success": True})
 
 @app.route("/submitVotes", methods = ['POST'])
 @cross_origin()
@@ -69,7 +69,7 @@ def submitVotes():
   votes = form['votes']
   with dbm() as db:
     db.add_votes(username, votes)
-  return
+  return jsonify({"success": True})
 
 
 if __name__ == "__main__":

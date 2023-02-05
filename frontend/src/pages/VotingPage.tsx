@@ -163,7 +163,7 @@ const VotingPage = () => {
 		if (!age || !gender) {
 			return
 		}
-		const resp = await userService.addUser({"gender":gender,"age": age, "username": username})
+		const resp = await userService.addUser(username,age,gender)
 		await dispatch(setIsRegistered(true));
 		console.log(isRegistered,"ir")
 	}
@@ -222,6 +222,11 @@ const VotingPage = () => {
 	}
 
 	const getNumCompletedVotes = () => {
+		console.log(pairs2Votes,userVotes,"votes")
+		if (!pairs2Votes) {
+			return 0
+		}
+
 		return Object.values(pairs2Votes).filter(val => val != null).length + userVotes.length
 	}
 
@@ -276,7 +281,8 @@ const VotingPage = () => {
 	
 	return (
 		<section ref = {inputRef} {...ArrowKeysReact.events} tabIndex = "-1" className = 'container votingPage focus:outline-0'>
-		{!isRegistered ?
+		{(pairs2Votes == null) || (votesToDo == null) || (userVotes == null) ? <></> :
+		!isRegistered ?
 			registerDiv() 
 			: 
 			<>

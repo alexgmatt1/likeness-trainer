@@ -15,11 +15,11 @@ class DbManager:
     def add_vote(self, username, chosen_image_filename, other_image_filename):
         """ Adds vote to database """
         self.cursor.execute("INSERT INTO votes(username, chosen_image_filename, other_image_filename, timestamp) VALUES(%s,%s,%s,%s)",\
-            (username, chosen_image_filename, other_image_filename, datetime.datetime()))
+            (username, chosen_image_filename, other_image_filename, datetime.datetime.now()))
         
     def add_votes(self, username, votes):
         """" Adds batch of votes to database with executemany """
-        time = datetime.datetime()
+        time = datetime.datetime.now()
         data = [[username] + vote + [time] for vote in votes]
         self.cursor.executemany("INSERT INTO votes(username, chosen_image_filename, other_image_filename, timestamp) VALUES(%s,%s,%s,%s)",\
             data)

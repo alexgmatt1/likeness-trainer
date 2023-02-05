@@ -4,7 +4,7 @@ import {userService} from '../services/userService.ts'
 import "./loginPage.scss"
 import {useNavigate} from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hook.ts";
-import {setUsername} from "../state/userSlice.ts";
+import {setUsername, setIsRegistered} from "../state/userSlice.ts";
 
 const LoginPage = () => {
 
@@ -19,6 +19,7 @@ const LoginPage = () => {
 		const alreadyRegistered = resp.isRegistered;
 		const valid = alreadyRegistered;
 		setIsValidUsername(valid);
+		await dispatch(setIsRegistered(valid));
 
 		if (!valid) {
 			return
