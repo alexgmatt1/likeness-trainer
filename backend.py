@@ -68,8 +68,7 @@ def submitVotes():
   username = form['username']
   votes = form['votes']
   with dbm() as db:
-    for vote in votes:
-      db.add_vote(username, vote[0], vote[1])
+    db.add_votes(username, votes)
   return
 
 
