@@ -39,7 +39,7 @@ class DbManager:
         """ Returns true if user has voted on specific pairing """
         self.cursor.execute("SELECT 1 FROM votes WHERE username=%s AND chosen_image_filename=%s AND other_image_filename=%s LIMIT 1",\
             (username, chosen_image_filename, other_image_filename))
-        return (self.cursor.fetchone()[0] == 1)
+        return bool(len(self.cursor.fetchone()))
 
     def count_votes(self, username):
         """ Returns amount of votes user has made """
@@ -55,11 +55,11 @@ class DbManager:
     def user_exists(self, username):
         """ Checks if user already exists in database """
         self.cursor.execute("SELECT 1 FROM users WHERE username=%s LIMIT 1", (username, ))
-        return (self.cursor.fetchone()[0] == 1)
+        return bool(len(self.cursor.fetchone()))
     
     def update_details(self, username, age, gender):
         """ Update record on  """
         self.cursor.execute("UPDATE users SET age=%s WHERE username=%s",\
             (age, username))
         self.cursor.execute("UPDATE users SET gender=%s WHERE username=%s",\
-            (age, gender))
+            (gender, username))
