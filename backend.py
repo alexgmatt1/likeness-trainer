@@ -9,7 +9,11 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-  return "hello"
+  with dbm() as db:
+    db.cursor.execute("select column_name from information_schema.columns where table_name='users' order by table_name, ordinal_position")
+    cols = db.cursor.fetchall()
+  print(cols)
+  return str(cols)
 
 @app.route("/test")
 def test():

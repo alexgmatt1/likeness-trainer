@@ -12,26 +12,26 @@ class DbManager:
         self.conn.commit()
         self.conn.close()
 
-    def add_vote(self, username, voted_image, other_image):
+    def add_vote(self, username, chosen_image_filename, other_image_filename):
         """ Adds vote to database """
-        self.cursor.execute("INSERT INTO votes(username, voted_image, other_image, timestamp) VALUES(%s,%s,%s,%s)",\
-            (username, voted_image, other_image, datetime.datetime()))
+        self.cursor.execute("INSERT INTO votes(username, chosen_image_filename, other_image_filename, timestamp) VALUES(%s,%s,%s,%s)",\
+            (username, chosen_image_filename, other_image_filename, datetime.datetime()))
 
-    def remove_vote(self, username, voted_image, other_image):
+    def remove_vote(self, username, chosen_image_filename, other_image_filename):
         """ Removes vote from database"""
-        self.cursor.execute("DELETE FROM votes WHERE username=%s AND voted_image=%s AND other_image=%s",\
-            (username, voted_image, other_image))
+        self.cursor.execute("DELETE FROM votes WHERE username=%s AND chosen_image_filename=%s AND other_image_filename=%s",\
+            (username, chosen_image_filename, other_image_filename))
 
     def get_votes(self, username):
         """ Retrieves pairs of (chosen image, other image) from votes user has made """
-        self.cursor.execute("SELECT voted_image, other_image FROM votes WHERE username=%s",\
+        self.cursor.execute("SELECT chosen_image_filename, other_image_filename FROM votes WHERE username=%s",\
             (username, ))
         return self.cursor.fetchall()
 
-    def vote_exists(self, username, voted_image, other_image):
+    def vote_exists(self, username, chosen_image_filename, other_image_filename):
         """ Returns true if user has voted on specific pairing """
-        self.cursor.execute("SELECT 1 FROM votes WHERE username=%s AND voted_image=%s AND other_image=%s LIMIT 1",\
-            (username, voted_image, other_image))
+        self.cursor.execute("SELECT 1 FROM votes WHERE username=%s AND chosen_image_filename=%s AND other_image_filename=%s LIMIT 1",\
+            (username, chosen_image_filename, other_image_filename))
         return (self.cursor.fetchone()[0] == 1)
 
     def count_votes(self, username):
