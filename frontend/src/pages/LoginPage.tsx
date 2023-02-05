@@ -15,10 +15,10 @@ const LoginPage = () => {
 
 	const login = async () => {
 		console.log(username)
-		//const resp = await userService.checkRegistered(username);
-		//const alreadyRegistered = resp.alreadyRegistered;
-		const valid = true;
-		setIsValidUsername(false);
+		const resp = await userService.checkRegistered(username);
+		const alreadyRegistered = resp.isRegistered;
+		const valid = alreadyRegistered;
+		setIsValidUsername(valid);
 
 		if (!valid) {
 			return

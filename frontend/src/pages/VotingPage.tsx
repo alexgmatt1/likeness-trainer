@@ -42,10 +42,13 @@ const VotingPage = () => {
 	}
 
 	const saveData = () => {
+
+
 			let votedData = Object.entries(pairs2Votes).filter(([pair,vote]) => vote != null).map(([pair,vote]) => {
 
 				return [vote, pair.split(',').filter(fn => fn != vote)[0]]
 			})
+			const resp = userService.submitVotes(username,votedData)
 			console.log("saved", votedData)
 			setSavedText(true)
 	}
@@ -74,9 +77,9 @@ const VotingPage = () => {
 
 
 	const getUserVotes = async () => {
-		//const resp = await userService.recoverVotes({"username":username})
-		//const userVotes = resp.votes
-		const votes = [["100_1_3.png","100_1_2.png"]]
+		const resp = await userService.recoverVotes(username)
+		const votes = resp.votes
+		//const votes = [["100_1_3.png","100_1_2.png"]]
 		await setUserVotes(votes)
 		setNumCompletedVotes(votes.length)
 		console.log(numCompletedVotes,"numcompleted")
@@ -160,7 +163,7 @@ const VotingPage = () => {
 		if (!age || !gender) {
 			return
 		}
-		//const resp = await userService.registerUser({"gender":gender,"age": age, "username": username})
+		const resp = await userService.addUser({"gender":gender,"age": age, "username": username})
 		await dispatch(setIsRegistered(true));
 		console.log(isRegistered,"ir")
 	}

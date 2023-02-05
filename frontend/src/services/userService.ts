@@ -10,9 +10,9 @@ const getImages = async () => {
 }
 
 
-const checkRegistered = async () => {
+const checkRegistered = async (username) => {
   try {
-    const response = await axiosRequest.get('checkRegistered')
+    const response = await axiosRequest.get('checkRegistered', {username})
     return response
   } catch (error) {
     return error.response.data
@@ -20,9 +20,9 @@ const checkRegistered = async () => {
 }
 
 
-const recoverVotes = async () => {
+const recoverVotes = async (username) => {
   try {
-    const response = await axiosRequest.post('recoverVotes')
+    const response = await axiosRequest.post('recoverVotes', {username})
     return response
   } catch (error) {
     return error.response.data
@@ -30,9 +30,9 @@ const recoverVotes = async () => {
 }
 
 
-const addUser = async (data) => {
+const addUser = async (username, age, gender) => {
   try {
-    const response = await axiosRequest.post('addUser', data)
+    const response = await axiosRequest.post('addUser', {username, age, gender})
     return response
   } catch (error) {
     return error.response.data
@@ -40,9 +40,9 @@ const addUser = async (data) => {
 }
 
 
-const submitVotes = async () => {
+const submitVotes = async (username,votes) => {
   try {
-    const response = await axiosRequest.post('submitVotes')
+    const response = await axiosRequest.post('submitVotes', {username,votes})
     return response
   } catch (error) {
     return error.response.data
