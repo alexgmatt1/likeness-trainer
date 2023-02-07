@@ -1,8 +1,10 @@
 import psycopg2
 import datetime
+
+from login import LOGIN_KWARGS
 class DbManager:
     def __init__(self):
-        self.conn = psycopg2.connect(host="likenesstrainerdb.postgres.database.azure.com", dbname="postgres", user="alexgmatt1", password="azureROCKS!")
+        self.conn = psycopg2.connect(**LOGIN_KWARGS)
         self.cursor = self.conn.cursor()
 
     def __enter__(self):
