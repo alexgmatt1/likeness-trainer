@@ -68,7 +68,16 @@ def submitVotes():
   username = form['username']
   votes = form['votes']
   with dbm() as db:
-    db.add_votes(username, votes)
+    for vote in votes:
+      chosen_image_filename = vote[0]
+      other_image_filename = vote[1]
+      if db.vote_exists(username, other_image_filename, chosen_image_filename):
+        db.remove_vote(username, other_image_filename, chosen_image_filename)
+        db.add_vote(username, chosen_image_filename, other_image_filename)
+      elif db.vote_exists(username, chosen_image_filename, other_image_filename):
+        continue
+      else:
+        db.add_vote(username, chosen_image_filename, other_image_filename)
   return jsonify({"success": True})
 
 

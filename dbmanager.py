@@ -20,10 +20,13 @@ class DbManager:
             (username, chosen_image_filename, other_image_filename, datetime.datetime.now()))
         
     def add_votes(self, username, votes):
-        """" Adds batch of votes to database with executemany """
+        """" 
+        Adds batch of votes to database with executemany 
+        TODO: Currently duplicating votes
+        """
         time = datetime.datetime.now()
         data = [[username] + vote + [time] for vote in votes]
-        self.cursor.executemany("INSERT INTO votes(username, chosen_image_filename, other_image_filename, timestamp) VALUES(%s,%s,%s,%s)",\
+        self.cursor.executemany("""IF EXISTS (SELECT * FROM votes WHERE (username=%s AND chosen_image_filename=%s AND other_image_filename=%s ))""",\
             data)
 
     def remove_vote(self, username, chosen_image_filename, other_image_filename):
@@ -38,10 +41,10 @@ class DbManager:
         return self.cursor.fetchall()
 
     def vote_exists(self, username, chosen_image_filename, other_image_filename):
-        """ Returns true if user has voted on specific pairing """
+        """ Returns true if user has made a specific vote pairing """
         self.cursor.execute("SELECT 1 FROM votes WHERE username=%s AND chosen_image_filename=%s AND other_image_filename=%s LIMIT 1",\
             (username, chosen_image_filename, other_image_filename))
-        return self.cursor.fetchone() != None
+        return (self.cursor.fetchone() != None)
 
     def count_votes(self, username):
         """ Returns amount of votes user has made """
