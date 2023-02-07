@@ -29,6 +29,7 @@ const VotingPage = () => {
 	const [newUpdates, setNewUpdates] = useState(0)
 	const saveRate = 5 // save every 5 votes/updates
 	const [savedText,setSavedText] = useState(false)
+	const [saving, setSaving] = useState(false)
 
 	const voteImage = (choice) => {
 		console.log("vote")
@@ -43,14 +44,20 @@ const VotingPage = () => {
 
 	const saveData = () => {
 
+			if (saving) {
+				return
+			}
+
 
 			let votedData = Object.entries(pairs2Votes).filter(([pair,vote]) => vote != null).map(([pair,vote]) => {
 
 				return [vote, pair.split(',').filter(fn => fn != vote)[0]]
 			})
+			setSaving(true)
 			const resp = userService.submitVotes(username,votedData)
 			console.log("saved", votedData)
 			setSavedText(true)
+			setSaving(false)
 	}
 
 	ArrowKeysReact.config({
