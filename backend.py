@@ -2,12 +2,19 @@ from flask import Flask
 import psycopg2
 import pandas as pd
 from flask import jsonify, request, render_template
-from flask_cors import CORS, cross_origin
+from flask.helpers import send_from_directory
 from dbmanager import DbManager as dbm
+from flask_cors import CORS,cross_origin
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder = 'frontend/build', static_url_path = '')
+CORS(app)
 
 @app.route("/")
+def serve():
+  return send_from_directory(app.static_folder, 'index.html')
+
+@app.route("/test123")
+cross_origin()
 def hello():
   with dbm() as db:
     db.cursor.execute("select column_name from information_schema.columns where table_name='users' order by table_name, ordinal_position")
