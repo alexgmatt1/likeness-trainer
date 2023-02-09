@@ -15,6 +15,7 @@ import ArrowKeysReact from 'arrow-keys-react';
 const VotingPage = () => {
 
 	const {username, isRegistered} = useAppSelector(state=>state.user)
+	const [registeredInfo, setRegisteredInfo] = useState(false)
 	const [gender,setGender] = useState(null);
 	const [age,setAge] = useState(21)
 	const [userVotes,setUserVotes] = useState(null)
@@ -172,6 +173,7 @@ const VotingPage = () => {
 		}
 		const resp = await userService.addUser(username,age,gender)
 		await dispatch(setIsRegistered(true));
+		setRegisteredInfo(true)
 		console.log(isRegistered,"ir")
 	}
 
@@ -289,7 +291,7 @@ const VotingPage = () => {
 	return (
 		<section ref = {inputRef} {...ArrowKeysReact.events} tabIndex = "-1" className = 'container votingPage focus:outline-0'>
 		{(pairs2Votes == null) || (votesToDo == null) || (userVotes == null) ? <></> :
-		!isRegistered ?
+		!registeredInfo ?
 			registerDiv() 
 			: 
 			<>
