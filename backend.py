@@ -16,7 +16,7 @@ def serve():
 @app.route("/test123")
 def hello():
   with dbm() as db:
-    db.cursor.execute("select column_name from information_schema.columns where table_name='users' order by table_name, ordinal_position")
+    db.cursor.execute("select * from votes")
     cols = db.cursor.fetchall()
   print(cols)
   return str(cols)
@@ -83,18 +83,9 @@ def submitVotes():
   username = form['username']
   votes = form['votes']
   with dbm() as db:
-    for vote in votes:
-      chosen_image_filename = vote[0]
-      other_image_filename = vote[1]
-      print(chosen_image_filename,other_image_filename)
-      if db.vote_exists(username, other_image_filename, chosen_image_filename):
-        db.remove_vote(username, other_image_filename, chosen_image_filename)
-        db.add_vote(username, chosen_image_filename, other_image_filename)
-      elif db.vote_exists(username, chosen_image_filename, other_image_filename):
-        print("continued")
-        continue
-      else:
-        db.add_vote(username, chosen_image_filename, other_image_filename)
+
+    db.add_votes(username, votes)
+
   return jsonify({"success": True})
 
 
