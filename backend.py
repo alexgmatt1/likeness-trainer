@@ -46,6 +46,9 @@ def checkRegistered():
     if resp != None:
       registered = True
       backgroundInfo = not (None in resp)
+    else:
+      registered = False
+      backgroundInfo = False
 
   return jsonify({"isRegistered": registered, "backgroundInfo":backgroundInfo})
 

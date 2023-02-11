@@ -26,8 +26,8 @@ const ethncities = [
 
 const VotingPage = () => {
 
-	const {username, isRegistered} = useAppSelector(state=>state.user)
-	const [registeredInfo, setRegisteredInfo] = useState(false)
+	const {username, isRegistered, backgroundInfo} = useAppSelector(state=>state.user)
+	const [registeredInfo, setRegisteredInfo] = useState(backgroundInfo)
 	const [gender,setGender] = useState(null);
 	const [age,setAge] = useState(21)
 	const [userVotes,setUserVotes] = useState(null)
@@ -46,6 +46,7 @@ const VotingPage = () => {
 	const [country, setCountry] = useState(null)
 	const [region, setRegion] = useState(null)
 	const [ethnicity, setEthnicity] = useState(null)
+	const [loading, setLoading] = useState(true)
 
 	const defaultEthnicity = ethncities[0];
 
@@ -53,7 +54,8 @@ const VotingPage = () => {
 		console.log("vote")
 		let currentPair = votesToDo[pageIdx]
 		setNewVotes(currentPair,currentPair[choice === 'left' ? 0 : 1])
-		setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1))
+		setLoading(true)
+		setTimeout(()=> {setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1)); setLoading(false)}, 500)
 		setNewUpdates(newUpdates+1)
 		if (savedText) {
 			setSavedText(false)
@@ -62,9 +64,9 @@ const VotingPage = () => {
 
 	const saveData = () => {
 
-			if (saving) {
-				return
-			}
+			//if (saving) {
+			//	return
+			//}
 
 
 			let votedData = Object.entries(pairs2Votes).filter(([pair,vote]) => vote != null).map(([pair,vote]) => {
@@ -103,6 +105,7 @@ const VotingPage = () => {
 
 	const getUserVotes = async () => {
 		const resp = await userService.recoverVotes(username)
+		setLoading(false)
 		const votes = resp.votes
 		//const votes = [["100_1_3.png","100_1_2.png"]]
 		await setUserVotes(votes)
@@ -291,7 +294,11 @@ const VotingPage = () => {
 		return (
 			<>
 			{console.log(drawing1Style,"d1se")}
-
+			{loading ? 
+				<div className = ''>
+				<img className = 'loading' src = {process.env.PUBLIC_URL + '/assets/' + 'spinner.gif'}/>
+				</div> :
+				<>
 			<div  className = 'votingGrid'>
 				<div className = 'imgDiv'>
 				<img src = {originalFile}/>
@@ -309,9 +316,10 @@ const VotingPage = () => {
 			</div>
 			<div className = 'backButtonDiv'>
 			<button disabled = {!pageIdx} onClick = {()=>setPageIdx(Math.max(0, pageIdx - 1))} className = 'btn_primary'> Previous </button>
-			<button disabled = {!pageIdx} onClick = {()=>setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1))} className = 'btn_primary'> Next </button>
+			<button disabled = {pageIdx == votesToDo.length - 1} onClick = {()=>setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1))} className = 'btn_primary'> Next </button>
 			<h5> Comparison: {pageIdx+1} / {votesToDo.length} </h5>
 			</div>
+			</>}
 			</>
 
 			)

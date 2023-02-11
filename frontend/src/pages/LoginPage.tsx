@@ -12,10 +12,13 @@ const LoginPage = () => {
 	const navigate = useNavigate()
 	const dispatch = useAppDispatch()
 	const [isValidUsername,setIsValidUsername] = useState(true)
+	const [loading,setLoading] = useState(false)
 
 	const login = async () => {
 		console.log(username)
+		setLoading(true)
 		const resp = await userService.checkRegistered(username);
+		setLoading(false)
 		const alreadyRegistered = resp.isRegistered;
 		const backgroundInfo = resp.backgroundInfo
 
@@ -23,6 +26,7 @@ const LoginPage = () => {
 		setIsValidUsername(valid);
 		await dispatch(setIsRegistered(valid));
 		await dispatch(setBackgroundInfo(backgroundInfo))
+
 
 		if (!valid) {
 			return
@@ -43,6 +47,9 @@ const LoginPage = () => {
 		<>
 		<section className = 'container loginDiv'>
 			<h1> Likeness Trainer </h1>
+			{loading ? <img className = 'loading' src = {process.env.PUBLIC_URL + '/assets/' + 'spinner.gif'}/>
+			:
+			<>
 			<h4> Please enter your access code </h4>
 			<div className = 'inputDiv'>
 			<InputText value = {username} setValue = {(e)=>setUsernameField(e.target.value)}/>
@@ -51,6 +58,7 @@ const LoginPage = () => {
 			<div className = 'loginButton'>
 				<button className = 'btn_primary' onClick = {()=> login()}> Log in </button>
 			</div>
+			</>}
 
 		</section>
 		</>
