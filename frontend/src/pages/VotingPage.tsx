@@ -9,6 +9,18 @@ import {userService} from '../services/userService.ts'
 import {setIsRegistered} from "../state/userSlice.ts";
 import ProgressBar from "@ramonak/react-progress-bar";
 import ArrowKeysReact from 'arrow-keys-react';
+import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+
+const ethncities = [
+  'Indian',
+'Pakistani',
+'Bangladeshi',
+'Chinese',
+'Other Asian background', 'Carribean', 'African', 'Other Black background', 'English' , 'Welsh', 'Scottish', 'Northern Irish', 'Irish', 'Gypsy', 'Other White background', 
+'Arab', 'Other ethnic group']
+;
 
 
 
@@ -31,6 +43,11 @@ const VotingPage = () => {
 	const saveRate = 5 // save every 5 votes/updates
 	const [savedText,setSavedText] = useState(false)
 	const [saving, setSaving] = useState(false)
+	const [country, setCountry] = useState(null)
+	const [region, setRegion] = useState(null)
+	const [ethnicity, setEthnicity] = useState(null)
+
+	const defaultEthnicity = ethncities[0];
 
 	const voteImage = (choice) => {
 		console.log("vote")
@@ -168,18 +185,19 @@ const VotingPage = () => {
 	, [votesToDo])
 
 	const registerUser = async () => {
-		if (!age || !gender) {
+		console.log(age,gender,country,region,ethnicity)
+		if (!age || !gender || !country || !region || !ethnicity) {
 			return
 		}
-		const resp = await userService.addUser(username,age,gender)
-		await dispatch(setIsRegistered(true));
+		const resp = await userService.addUser(username,age,gender, country, region, ethnicity)
+		//await dispatch(setIsRegistered(true));
 		setRegisteredInfo(true)
-		console.log(isRegistered,"ir")
+		
 	}
 
 
 
-	console.log(isRegistered)
+
 
 	const registerDiv = () => {
 		return (
@@ -213,7 +231,20 @@ const VotingPage = () => {
 
 					              />
 				</div>
-
+				<div className = 'registerField'>
+				<h4> Current Address: Country and Region </h4>
+				<CountryDropdown
+          value={country}
+          onChange={(val) => setCountry(val)} />
+        <RegionDropdown
+          country={country}
+          value={region}
+          onChange={(val) => setRegion(val)} />
+        </div>
+        <div className = 'registerField'>
+        <h4> Ethnicity: </h4>
+				<Dropdown options={ethncities} onChange={(eth) => setEthnicity(eth.value)} value={defaultEthnicity} placeholder="Select an option" />
+				</div>
 				<button className = 'btn_primary' onClick = {registerUser} > Confirm </button>
 				
 			</div>

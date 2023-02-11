@@ -30,11 +30,12 @@ const recoverVotes = async (username) => {
 }
 
 
-const addUser = async (username, age, gender) => {
+const addUser = async (username, age, gender, country, region, ethnicity) => {
   try {
-    const response = await axiosRequest.post('addUser', {username, age, gender})
+    const response = await axiosRequest.post('addUser', {username, age, gender, country, region, ethnicity})
     return response
   } catch (error) {
+    console.log(error)
     return error.response.data
   }
 }

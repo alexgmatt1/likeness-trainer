@@ -44,7 +44,7 @@ class DbManager:
         """ Returns true if user has made a specific vote pairing """
         self.cursor.execute("SELECT 1 FROM votes WHERE username=%s AND chosen_image_filename=%s AND other_image_filename=%s LIMIT 1",\
             (username, chosen_image_filename, other_image_filename))
-        return (self.cursor.fetchone() != None)
+        return self.cursor.fetchone() != None
 
     def count_votes(self, username):
         """ Returns amount of votes user has made """
@@ -52,19 +52,18 @@ class DbManager:
             (username, ))
         return self.cursor.fetchone()[0]
 
-    def add_user(self, username, age, gender):
+    def add_user(self, username, age, gender, country, region, ethnicity):
         """ Adds user to database """
-        self.cursor.execute("INSERT INTO users(username, age, gender) VALUES(%s, %s, %s)",\
+        self.cursor.execute("INSERT INTO users(username, age, gender, country, region, ethnicity) VALUES(%s, %s, %s)",\
             (username, age, gender))
     
     def user_exists(self, username):
         """ Checks if user already exists in database """
-        self.cursor.execute("SELECT 1 FROM users WHERE username=%s LIMIT 1", (username, ))
-        return self.cursor.fetchone() != None
+        self.cursor.execute("SELECT age, gender, country, region, ethnicity FROM users WHERE username=%s LIMIT 1", (username, ))
+        return self.cursor.fetchone()
     
-    def update_details(self, username, age, gender):
+    def update_details(self, username, age, gender, country, region, ethnicity):
         """ Update record on  """
-        self.cursor.execute("UPDATE users SET age=%s WHERE username=%s",\
-            (age, username))
-        self.cursor.execute("UPDATE users SET gender=%s WHERE username=%s",\
-            (gender, username))
+        self.cursor.execute("UPDATE users SET age=%s, gender = %s, country = %s, region = %s, ethnicity = %s WHERE username=%s",\
+            (age, gender, country, region, ethnicity, username))
+       

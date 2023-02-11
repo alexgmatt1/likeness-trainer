@@ -41,8 +41,13 @@ def checkRegistered():
   form = request.get_json()
   username = form['username']
   with dbm() as db:
-    registered = db.user_exists(username)
-  return jsonify({"isRegistered": registered})
+    resp = db.user_exists(username)
+    print(resp)
+    if resp != None:
+      registered = True
+      backgroundInfo = not (None in resp)
+
+  return jsonify({"isRegistered": registered, "backgroundInfo":backgroundInfo})
 
 @app.route("/recoverVotes", methods = ['POST'])
 @cross_origin()
@@ -59,11 +64,15 @@ def recoverVotes():
 def addUserInfo():
   """ Adds new record to users table """
   form = request.get_json()
+  print(form)
   username = form['username']
   age = form['age']
+  country = form['country']
+  region = form['region']
+  ethnicity = form['ethnicity']
   gender = form['gender'].capitalize()
   with dbm() as db:
-    db.update_details(username, age, gender)
+    db.update_details(username, age, gender, country, region, ethnicity)
   return jsonify({"success": True})
 
 @app.route("/submitVotes", methods = ['POST'])
@@ -77,10 +86,12 @@ def submitVotes():
     for vote in votes:
       chosen_image_filename = vote[0]
       other_image_filename = vote[1]
+      print(chosen_image_filename,other_image_filename)
       if db.vote_exists(username, other_image_filename, chosen_image_filename):
         db.remove_vote(username, other_image_filename, chosen_image_filename)
         db.add_vote(username, chosen_image_filename, other_image_filename)
       elif db.vote_exists(username, chosen_image_filename, other_image_filename):
+        print("continued")
         continue
       else:
         db.add_vote(username, chosen_image_filename, other_image_filename)
