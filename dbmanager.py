@@ -16,23 +16,30 @@ class DbManager:
 
     def add_vote(self, username, chosen_image_filename, other_image_filename):
         """ Adds vote to database """
-        self.cursor.execute("INSERT INTO votes(username, chosen_image_filename, other_image_filename, timestamp) VALUES(%s,%s,%s,%s)",\
+        self.cursor.execute("INSERT INTO votes(username, chosen_image_filename, other_image_filename, timestamp) VALUES(%s,%s,%s,%s) ON conflict (username, chosen_image_filename, other_image_filename) do nothing",\
             (username, chosen_image_filename, other_image_filename, datetime.datetime.now()))
+        self.conn.commit()
         
     def add_votes(self, username, votes):
-        """" 
+        """ 
         Adds batch of votes to database with executemany 
-        TODO: Currently duplicating votes
+
         """
         time = datetime.datetime.now()
-        data = [[username] + vote + [time] for vote in votes]
-        self.cursor.executemany("""IF EXISTS (SELECT * FROM votes WHERE (username=%s AND chosen_image_filename=%s AND other_image_filename=%s ))""",\
+        data = [{'username':username, 'chosen_image_filename':vote[0], 'other_image_filename':vote[1], 'timestamp':time} for vote in votes]
+        self.cursor.executemany("""
+            UPDATE votes SET chosen_image_filename=%(chosen_image_filename)s, other_image_filename=%(other_image_filename)s, timestamp=%(timestamp)s 
+            WHERE username=%(username)s AND chosen_image_filename=%(other_image_filename)s AND other_image_filename=%(chosen_image_filename)s;
+            INSERT INTO votes(username, chosen_image_filename, other_image_filename, timestamp) VALUES (%(username)s, %(chosen_image_filename)s, %(other_image_filename)s, %(timestamp)s)
+            ON conflict (username, chosen_image_filename, other_image_filename) do nothing;
+            """,\
             data)
 
     def remove_vote(self, username, chosen_image_filename, other_image_filename):
         """ Removes vote from database"""
         self.cursor.execute("DELETE FROM votes WHERE username=%s AND chosen_image_filename=%s AND other_image_filename=%s",\
             (username, chosen_image_filename, other_image_filename))
+        self.conn.commit()
 
     def get_votes(self, username):
         """ Retrieves pairs of (chosen image, other image) from votes user has made """
@@ -56,6 +63,7 @@ class DbManager:
         """ Adds user to database """
         self.cursor.execute("INSERT INTO users(username, age, gender) VALUES(%s, %s, %s)",\
             (username, age, gender))
+        self.conn.commit()
     
     def user_exists(self, username):
         """ Checks if user already exists in database """
@@ -68,3 +76,4 @@ class DbManager:
             (age, username))
         self.cursor.execute("UPDATE users SET gender=%s WHERE username=%s",\
             (gender, username))
+        self.conn.commit()
