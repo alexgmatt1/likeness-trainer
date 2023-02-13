@@ -1,18 +1,63 @@
 import psycopg2
 import datetime
+from psycopg2.pool import ThreadedConnectionPool as _ThreadedConnectionPool
+from threading import Semaphore, Lock
+
+class ThreadedConnectionPool(_ThreadedConnectionPool):
+    def __init__(self, minconn, maxconn, *args, **kwargs):
+        self._semaphore = Semaphore(maxconn)
+        self._key_lock = Lock()
+        self._key_locks = {}
+        super().__init__(minconn, maxconn, *args, **kwargs)
+
+    def getconn(self, key = None):
+        self._semaphore.acquire()
+        
+        if key is not None:
+            self._key_lock.acquire()
+            try:
+                if key in self._key_locks:
+                    self._key_locks[key].acquire()
+                else:
+                    lock = Lock()
+                    lock.acquire()
+                    self._key_locks[key] = lock
+            finally:
+                self._key_lock.release()
+        print(self._key_locks)
+        try:
+            return super().getconn(key)
+        except:
+            self._semaphore.release()
+            if key is not None:
+                self._key_locks[key].release()
+            raise
+
+    def putconn(self, conn = None, key = None, close = False):
+        try:
+            super().putconn(conn, key, close)
+        finally:
+            self._semaphore.release()
+            if key is not None:
+                self._key_locks[key].release()
 
 from login import LOGIN_KWARGS
 class DbManager:
-    def __init__(self):
-        self.conn = psycopg2.connect(**LOGIN_KWARGS)
+    pool = ThreadedConnectionPool(1, 20, **LOGIN_KWARGS)
+
+    def __init__(self, source):
+        self.source = source
+        self.conn = self.pool.getconn(key = source)
         self.cursor = self.conn.cursor()
+        print(self.conn)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_class, exc, traceback):
         self.conn.commit()
-        self.conn.close()
+        self.cursor.close()
+        self.pool.putconn(self.conn, key = self.source)
 
     def add_vote(self, username, chosen_image_filename, other_image_filename):
         """ Adds vote to database """
@@ -34,6 +79,7 @@ class DbManager:
             ON conflict (username, chosen_image_filename, other_image_filename) do nothing;
             """,\
             data)
+        self.conn.commit()
 
     def remove_vote(self, username, chosen_image_filename, other_image_filename):
         """ Removes vote from database"""
