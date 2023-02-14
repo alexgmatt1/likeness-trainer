@@ -2,6 +2,7 @@ import psycopg2
 import datetime
 from psycopg2.pool import ThreadedConnectionPool as _ThreadedConnectionPool
 from threading import Semaphore, Lock
+from login import LOGIN_KWARGS
 
 class ThreadedConnectionPool(_ThreadedConnectionPool):
     def __init__(self, minconn, maxconn, *args, **kwargs):
@@ -15,22 +16,26 @@ class ThreadedConnectionPool(_ThreadedConnectionPool):
         
         if key is not None:
             self._key_lock.acquire()
+            print(str(key), "blocking keyed connection access")
             try:
                 if key in self._key_locks:
                     self._key_locks[key].acquire()
+                    print(str(key), "connection lock acquired")
                 else:
                     lock = Lock()
                     lock.acquire()
                     self._key_locks[key] = lock
+                    print(str(key), "connection lock acquired")
             finally:
                 self._key_lock.release()
-        print(self._key_locks)
+                print(str(key), "no longer blocking keyed connection access")
         try:
             return super().getconn(key)
         except:
             self._semaphore.release()
             if key is not None:
                 self._key_locks[key].release()
+                print(str(key), "connection lock released")
             raise
 
     def putconn(self, conn = None, key = None, close = False):
@@ -40,16 +45,16 @@ class ThreadedConnectionPool(_ThreadedConnectionPool):
             self._semaphore.release()
             if key is not None:
                 self._key_locks[key].release()
+                print(str(key), "connection lock released")
 
-from login import LOGIN_KWARGS
 class DbManager:
     pool = ThreadedConnectionPool(1, 20, **LOGIN_KWARGS)
 
     def __init__(self, source):
         self.source = source
         self.conn = self.pool.getconn(key = source)
+        print(str(self.source), " connected")
         self.cursor = self.conn.cursor()
-        print(self.conn)
 
     def __enter__(self):
         return self
@@ -58,6 +63,7 @@ class DbManager:
         self.conn.commit()
         self.cursor.close()
         self.pool.putconn(self.conn, key = self.source)
+        print(str(self.source), "disconnected")
 
     def add_vote(self, username, chosen_image_filename, other_image_filename):
         """ Adds vote to database """

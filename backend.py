@@ -1,12 +1,9 @@
 from flask import Flask
-import psycopg2
-from psycopg2 import pool
 import pandas as pd
 from flask import jsonify, request, render_template
 from flask.helpers import send_from_directory
 from dbmanager import DbManager as dbm
 from flask_cors import CORS,cross_origin
-from login import LOGIN_KWARGS
 
 app = Flask(__name__, static_folder = 'frontend/build', static_url_path = '')
 CORS(app)
@@ -25,9 +22,7 @@ def hello():
 
 @app.route("/test")
 def test():
-  with dbm(None) as db:
-    db.cursor.execute("DELETE FROM votes")
-  return "deleted"
+  return "Testing"
 
 
 @app.route("/getImages", methods = ['POST'])
