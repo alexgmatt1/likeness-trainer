@@ -134,20 +134,23 @@ const VotingPage = () => {
 	const getVotesToDo = async () => {
 		const allPairs = await getAllPairs()
 		//now filter allPairs by removing all already voted
+		console.log("uservotes",userVotes)
 		const filteredPairs = allPairs.filter((data) => {
-			let id = data.slice(-1)
+			let id = data.slice(-1)[0]
+			console.log("id",id)
 			
-			return userVotes.map((pair)=> pair.slice(-1) == id ).some(item => item) ?
+			return userVotes.map((pair)=> pair.slice(-1)[0] === id ).some(item => item) ?
 				false : true
 			
 		})
 
 		let id2pairTemp = {}
 		for (const row of allPairs) {
-			id2pairTemp[row.slice(-1)] = row.slice(0,-1)
+			id2pairTemp[row.slice(-1)[0]] = row.slice(0,-1)
 		}
 		setId2Pair(id2pairTemp)
 
+		console.log(filteredPairs,"filteredPairs")
 
 		await setVotesToDo(filteredPairs)
 	}
@@ -186,8 +189,8 @@ const VotingPage = () => {
 		let combinations2VotesTemp = {}
 		console.log(votesToDo,"vtd")
 		votesToDo.map(pair => {
-			console.log(pair.slice(-1))
-			combinations2VotesTemp[pair.slice(-1)] = null
+			console.log(pair.slice(-1)[0])
+			combinations2VotesTemp[pair.slice(-1)[0]] = null
 		})
 		console.log(combinations2VotesTemp,"temp")
 		setCombinations2Votes(combinations2VotesTemp)}
@@ -263,7 +266,7 @@ const VotingPage = () => {
 
 	const setNewVotes = (pair,vote) => {
 		let combinations2VotesTemp = combinations2Votes
-		combinations2VotesTemp[pair.slice(-1)] = vote
+		combinations2VotesTemp[pair.slice(-1)[0]] = vote
 		setCombinations2Votes({...combinations2VotesTemp})
 		setNumCompletedVotes(numCompletedVotes + 1)
 
@@ -292,7 +295,7 @@ const VotingPage = () => {
 		let image2 = process.env.PUBLIC_URL + '/assets/FairFace/' + currentPair[1]
 		let image3 = process.env.PUBLIC_URL + '/assets/FairFace/' + currentPair[2]
 
-		let currentVote = combinations2Votes[currentPair.slice(-1)]
+		let currentVote = combinations2Votes[currentPair.slice(-1)[0]]
 		let drawing1_selected = currentVote === currentPair[0]
 
 		console.log(`imgDiv ${drawing1_selected ? "drawingSelected" : false}`)
