@@ -30,7 +30,7 @@ def test():
 @cross_origin()
 def getImages():
   """ Returns json formatted list of image files {images: list(images)} """
-  df = pd.read_csv("./frontend/public/assets/files.csv")
+  df = pd.read_csv("./frontend/public/assets/filesID.csv")
   print(df)
   return jsonify({"images": list(df.itertuples(index=False))})
 

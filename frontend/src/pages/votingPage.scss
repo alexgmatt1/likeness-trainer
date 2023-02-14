@@ -40,6 +40,8 @@ flex-direction:column;
 
 	& img {
 		margin: 2rem;
+		
+		
 	}
 
 	&__drawing {
@@ -56,6 +58,7 @@ flex-direction:column;
 	display:flex;
 	flex-direction:column;
 	border-radius: 20px;
+
 }
 
 .drawingSelected {

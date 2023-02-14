@@ -33,7 +33,7 @@ const VotingPage = () => {
 	const [userVotes,setUserVotes] = useState(null)
 	const [votesToDo,setVotesToDo] = useState(null)
 	//const [newVotes, setNewVotes] = useState(null)
-	const [pairs2Votes,setPairs2Votes] = useState(null)
+	const [combinations2Votes,setCombinations2Votes] = useState(null)
 	const navigate = useNavigate()
 	const dispatch = useAppDispatch()
 	const [pageIdx,setPageIdx] = useState(0);
@@ -47,13 +47,16 @@ const VotingPage = () => {
 	const [region, setRegion] = useState(null)
 	const [ethnicity, setEthnicity] = useState(null)
 	const [loading, setLoading] = useState(true)
+	const [id2pair,setId2Pair] = useState(null)
 
 	const defaultEthnicity = ethncities[0];
+
+	console.log("combinations2Votes",combinations2Votes)
 
 	const voteImage = (choice) => {
 		console.log("vote")
 		let currentPair = votesToDo[pageIdx]
-		setNewVotes(currentPair,currentPair[choice === 'left' ? 0 : 1])
+		setNewVotes(currentPair,currentPair[choice])
 		setLoading(true)
 		setTimeout(()=> {setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1)); setLoading(false)}, 500)
 		setNewUpdates(newUpdates+1)
@@ -69,9 +72,10 @@ const VotingPage = () => {
 			//}
 
 
-			let votedData = Object.entries(pairs2Votes).filter(([pair,vote]) => vote != null).map(([pair,vote]) => {
+			let votedData = Object.entries(combinations2Votes).filter(([id,vote]) => vote != null).map(([id,vote]) => {
 
-				return [vote, pair.split(',').filter(fn => fn != vote)[0]]
+
+				return {"chosenImage":vote, "combinationID":id}
 			})
 			setSaving(true)
 			const resp = userService.submitVotes(username,votedData)
@@ -83,10 +87,13 @@ const VotingPage = () => {
 	ArrowKeysReact.config({
       left: () => {
      
-        voteImage("left")
+        voteImage(0)
+      },
+      down: () => {
+      	voteImage(1)
       },
       right: () => {
-      	 voteImage("right")
+      	 voteImage(2)
         
       },
       
@@ -115,7 +122,10 @@ const VotingPage = () => {
 
 	const getAllPairs = async () => {
 		const resp = await userService.getImages();
-		const allPairs = resp.images.map(triple => [triple[1],triple[2]])
+		const allPairs = resp.images
+		
+
+		console.log(resp)
 		//const allPairs = [["100_1_1.png","100_1_2.png"], ["100_1_1.png","100_1_3.png"], ["100_1_2.png","100_1_3.png"]]
 		return allPairs
 
@@ -125,12 +135,19 @@ const VotingPage = () => {
 		const allPairs = await getAllPairs()
 		//now filter allPairs by removing all already voted
 		const filteredPairs = allPairs.filter((data) => {
-			let [image_1,image_2] = data
+			let id = data.slice(-1)
 			
-			return userVotes.map((pair)=> pair.includes(image_1) && pair.includes(image_2)).some(item => item) ?
+			return userVotes.map((pair)=> pair.slice(-1) == id ).some(item => item) ?
 				false : true
 			
 		})
+
+		let id2pairTemp = {}
+		for (const row of allPairs) {
+			id2pairTemp[row.slice(-1)] = row.slice(0,-1)
+		}
+		setId2Pair(id2pairTemp)
+
 
 		await setVotesToDo(filteredPairs)
 	}
@@ -142,21 +159,7 @@ const VotingPage = () => {
 
 
 
-	const convertVotesToFileNames = (votes) => {
-		let converted = []
-		return votes.map((pair) => {
-			let [voted,other] = pair
-			console.log(voted)
-			let [original,artist,variant] = voted.split('_')
-			let variant_id = variant.split('.')[0]
-			let votedFilename = convert2Fn(original,artist,variant_id)
-			let [original2,artist2,variant2] = other.split('_')
-			variant2 = variant2.split('.')[0]
-			let otherFilename = convert2Fn(original2,artist2,variant2)
-			return [votedFilename,otherFilename]
-		})
-
-	}
+	
 
 
 	useEffect(() => {
@@ -180,11 +183,14 @@ const VotingPage = () => {
 			return
 		}
 
-		let pairs2VotesTemp = {}
+		let combinations2VotesTemp = {}
+		console.log(votesToDo,"vtd")
 		votesToDo.map(pair => {
-			pairs2VotesTemp[pair] = null
+			console.log(pair.slice(-1))
+			combinations2VotesTemp[pair.slice(-1)] = null
 		})
-		setPairs2Votes(pairs2VotesTemp)}
+		console.log(combinations2VotesTemp,"temp")
+		setCombinations2Votes(combinations2VotesTemp)}
 	, [votesToDo])
 
 	const registerUser = async () => {
@@ -256,21 +262,21 @@ const VotingPage = () => {
 	}
 
 	const setNewVotes = (pair,vote) => {
-		let pairs2VotesTemp = pairs2Votes
-		pairs2VotesTemp[pair] = vote
-		setPairs2Votes({...pairs2VotesTemp})
+		let combinations2VotesTemp = combinations2Votes
+		combinations2VotesTemp[pair.slice(-1)] = vote
+		setCombinations2Votes({...combinations2VotesTemp})
 		setNumCompletedVotes(numCompletedVotes + 1)
 
-		console.log("pairs2VotesTemp",pairs2VotesTemp, numCompletedVotes)
+		console.log("combinations2VotesTemp",combinations2VotesTemp, numCompletedVotes)
 	}
 
 	const getNumCompletedVotes = () => {
-		console.log(pairs2Votes,userVotes,"votes")
-		if (!pairs2Votes) {
+		console.log(combinations2Votes,userVotes,"votes")
+		if (!combinations2Votes) {
 			return 0
 		}
 
-		return Object.values(pairs2Votes).filter(val => val != null).length + userVotes.length
+		return Object.values(combinations2Votes).filter(val => val != null).length + userVotes.length
 	}
 
 	const VotingGrid = () => {
@@ -280,12 +286,13 @@ const VotingPage = () => {
 		}
 
 		let currentPair = votesToDo[pageIdx]
-		let originalId = currentPair[0].split('_')[0]
-		let originalFile = process.env.PUBLIC_URL + '/assets/FairFace/' + originalId + '.jpg'
-		let drawing1 = process.env.PUBLIC_URL + '/assets/Drawings/' + currentPair[0]
-		let drawing2 = process.env.PUBLIC_URL + '/assets/Drawings/' + currentPair[1]
+		//let originalId = currentPair[0].split('_')[0]
+		let sketch = process.env.PUBLIC_URL + '/assets/Drawings (1)/' + currentPair[3]
+		let image1 = process.env.PUBLIC_URL + '/assets/FairFace/' + currentPair[0]
+		let image2 = process.env.PUBLIC_URL + '/assets/FairFace/' + currentPair[1]
+		let image3 = process.env.PUBLIC_URL + '/assets/FairFace/' + currentPair[2]
 
-		let currentVote = pairs2Votes[currentPair]
+		let currentVote = combinations2Votes[currentPair.slice(-1)]
 		let drawing1_selected = currentVote === currentPair[0]
 
 		console.log(`imgDiv ${drawing1_selected ? "drawingSelected" : false}`)
@@ -301,16 +308,20 @@ const VotingPage = () => {
 				<>
 			<div  className = 'votingGrid'>
 				<div className = 'imgDiv'>
-				<img src = {originalFile}/>
-				<h4> Original Image </h4>
+				<img src = {sketch}/>
+				<h4> Sketch </h4>
 				</div>
-				<div className = {drawing1Style} >
-				<img onClick = {()=> {voteImage("left")}} className = 'votingGrid__drawing' src = {drawing1}/>
-				<h4> Drawing 1 </h4>
+				<div className = {`imgDiv ${currentVote === currentPair[0] && "drawingSelected"}`} >
+				<img onClick = {()=> {voteImage(0)}} className = 'votingGrid__drawing' src = {image1}/>
+				<h4> Image 1 </h4>
 				</div>
 				<div className = {`imgDiv ${currentVote === currentPair[1] && "drawingSelected"}`}>
-				<img onClick = {()=> {voteImage("right")}}  className = 'votingGrid__drawing' src = {drawing2} />
-				<h4> Drawing 2 </h4>
+				<img onClick = {()=> {voteImage(1)}}  className = 'votingGrid__drawing' src = {image2} />
+				<h4> Image 2 </h4>
+				</div>
+				<div className = {`imgDiv ${currentVote === currentPair[2] && "drawingSelected"}`} >
+				<img onClick = {()=> {voteImage(0)}} className = 'votingGrid__drawing' src = {image3}/>
+				<h4> Image 3 </h4>
 				</div>
 
 			</div>
@@ -329,7 +340,7 @@ const VotingPage = () => {
 	
 	return (
 		<section ref = {inputRef} {...ArrowKeysReact.events} tabIndex = "-1" className = 'container votingPage focus:outline-0'>
-		{(pairs2Votes == null) || (votesToDo == null) || (userVotes == null) ? <></> :
+		{(combinations2Votes == null) || (votesToDo == null) || (userVotes == null) ? <></> :
 		!registeredInfo ?
 			registerDiv() 
 			: 
