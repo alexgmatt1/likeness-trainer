@@ -63,8 +63,8 @@ class DbManager:
 
     def add_user(self, username, age, gender, country, region, ethnicity):
         """ Adds user to database """
-        self.cursor.execute("INSERT INTO users(username, age, gender, country, region, ethnicity) VALUES(%s, %s, %s)",\
-            (username, age, gender))
+        self.cursor.execute("INSERT INTO users(username, age, gender, country, region, ethnicity) VALUES(%s, %s, %s, %s, %s, %s)",\
+            (username, age, gender, country, region, ethnicity))
         self.conn.commit()
     
     def user_exists(self, username):
