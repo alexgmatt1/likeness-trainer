@@ -1,5 +1,4 @@
 from flask import Flask
-import psycopg2
 import pandas as pd
 from flask import jsonify, request, render_template
 from flask.helpers import send_from_directory
@@ -15,7 +14,7 @@ def serve():
 
 @app.route("/test123")
 def hello():
-  with dbm() as db:
+  with dbm(None) as db:
     db.cursor.execute("select * from votes")
     cols = db.cursor.fetchall()
   print(cols)
@@ -40,7 +39,7 @@ def checkRegistered():
   """ Returns boolean true if username already exists in the username column of the users table, otherwise false """
   form = request.get_json()
   username = form['username']
-  with dbm() as db:
+  with dbm(None) as db:
     resp = db.user_exists(username)
     print(resp)
     if resp != None:
@@ -58,7 +57,7 @@ def recoverVotes():
   """ Returns json formatted list of votes that user has already made in database {votes: list((chosen, other), ...)} """
   form = request.get_json()
   username = form['username']
-  with dbm() as db:
+  with dbm(None) as db:
     votes = db.get_votes(username)
   return jsonify({"votes": list(votes)})
 
@@ -74,7 +73,7 @@ def addUserInfo():
   region = form['region']
   ethnicity = form['ethnicity']
   gender = form['gender'].capitalize()
-  with dbm() as db:
+  with dbm(None) as db:
     db.update_details(username, age, gender, country, region, ethnicity)
   return jsonify({"success": True})
 
@@ -85,8 +84,7 @@ def submitVotes():
   form = request.get_json()
   username = form['username']
   votes = form['votes']
-  with dbm() as db:
-
+  with dbm(username) as db:
     db.add_votes(username, votes)
 
   return jsonify({"success": True})
