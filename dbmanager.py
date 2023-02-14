@@ -5,13 +5,27 @@ from threading import Semaphore, Lock
 from login import LOGIN_KWARGS
 
 class ThreadedConnectionPool(_ThreadedConnectionPool):
+    """" 
+    Threaded connection pool class: Wrapper around psycopg2.pool.ThreadedConnectionPool class\n
+    Implements semaphore to prevent connection exhuastion errors\n
+    Implements locks around keyed connections to prevent multiple threads from acquiring the same connection with key
+    """
     def __init__(self, minconn, maxconn, *args, **kwargs):
+        """" 
+        minconn: minimum number of connections that will be available
+        maxconn: maximum number of connections that will be available
+        """
         self._semaphore = Semaphore(maxconn)
         self._key_lock = Lock()
         self._key_locks = {}
         super().__init__(minconn, maxconn, *args, **kwargs)
 
     def getconn(self, key = None):
+        """
+        key: (optional) if key is not None the connection associated with the key will be returned\n
+        Acquire a connection from the pool and return it\n
+        If key is provided, block access to the connection by other threads till the connection is put back in the pool
+        """
         self._semaphore.acquire()
         
         if key is not None:
@@ -39,6 +53,12 @@ class ThreadedConnectionPool(_ThreadedConnectionPool):
             raise
 
     def putconn(self, conn = None, key = None, close = False):
+        """
+        conn: the connection to be put back in the pool
+        key: (optional) if key is not None the connection will be put back in the pool with association to the given key, this should use the same key that was previously used with getconn()
+        close: (optional) if True the connection will be closed when put back in the pool
+        Returns the connection to the pool
+        """
         try:
             super().putconn(conn, key, close)
         finally:
