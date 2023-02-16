@@ -149,6 +149,6 @@ class DbManager:
 
         self.cursor.execute("UPDATE users SET age=%s, gender = %s, country = %s, region = %s, ethnicity = %s WHERE username=%s",\
             (age, gender, country, region, ethnicity, username))
-        sel.conn.commit()
+        self.conn.commit()
        
 
