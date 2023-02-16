@@ -411,8 +411,8 @@ const VotingPage = () => {
 
 			{savedText && <h5> Autosaved! </h5>}
 			</div>
-			<h2> Select the drawing that you believe captures the most resemblance to the original image. </h2>
-			<h4> Press the left arrow key to select drawing 1, and the right arrow key for drawing 2. You can also use the mouse to select. </h4>
+			<h2> Select the original image that you believe captures the most resemblance to the sketch. </h2>
+			<h4> Press the left arrow key to select image 1, down key for image 2 and the right arrow key for image 3. You can also use the mouse to select. </h4>
 			<h2>Comparison: {pageIdx+1} / {votesToDo.length} </h2>
 			{VotingGrid()}
 			</>}

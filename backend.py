@@ -4,6 +4,8 @@ from flask import jsonify, request, render_template
 from flask.helpers import send_from_directory
 from dbmanager import DbManager as dbm
 from flask_cors import CORS,cross_origin
+import numpy as np
+import random
 
 app = Flask(__name__, static_folder = 'frontend/build', static_url_path = '')
 CORS(app)
@@ -29,7 +31,26 @@ def test():
 @cross_origin()
 def getImages():
   """ Returns json formatted list of image files {images: list(images)} """
-  df = pd.read_csv("./frontend/public/assets/filesFinal.csv")
+  df = pd.read_csv("./frontend/public/assets/filesFinal2.csv")
+  final = []
+  print(int(len(df)/3))
+  groups = [[3*i,3*i+1,3*i+2] for i in range(int(len(df)/3))]
+  idx2bucket = {i : groups[i] for i in range(len(groups))}
+  for i in range(len(df)):
+
+    random_idx = random.choice(list(idx2bucket.keys()))
+    
+    bucket = idx2bucket[random_idx]
+   
+    first = bucket.pop(0)
+    final += [first]
+    if len(bucket) == 0:
+    
+      
+      del idx2bucket[random_idx]
+
+  df = df.iloc[final]
+
   df['ID'] = df.apply(lambda x: "".join(sorted([fn.split('.')[0] for fn in x])), axis = 1)
 
   print(df)
