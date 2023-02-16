@@ -12,8 +12,9 @@ import ArrowKeysReact from 'arrow-keys-react';
 import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
+import Toggle from 'react-toggle'
 
-const ethncities = [
+const ethnicities = [
   'Indian',
 'Pakistani',
 'Bangladeshi',
@@ -40,16 +41,22 @@ const VotingPage = () => {
 	const [numCompletedVotes,setNumCompletedVotes] = useState(0)
 	const inputRef = useRef(null);
 	const [newUpdates, setNewUpdates] = useState(0)
-	const saveRate = 5 // save every 5 votes/updates
+	const saveRate = 3 // save every 5 votes/updates
 	const [savedText,setSavedText] = useState(false)
 	const [saving, setSaving] = useState(false)
 	const [country, setCountry] = useState(null)
 	const [region, setRegion] = useState(null)
-	const [ethnicity, setEthnicity] = useState(null)
+	const [ethnicity, setEthnicity] = useState(ethnicities[0])
 	const [loading, setLoading] = useState(true)
 	const [id2pair,setId2Pair] = useState(null)
 
-	const defaultEthnicity = ethncities[0];
+	const [genderDisabled,setGenderDisabled] = useState(false)
+	const [ageDisabled,setAgeDisabled] = useState(false)
+	const [countryDisabled,setCountryDisabled] = useState(false)
+	const [ethnicityDisabled,setEthnicityDisabled] = useState(false)
+	const [allInputError,setAllInputError] = useState(false)
+
+	const defaultEthnicity = ethnicities[0];
 
 	console.log("combinations2Votes",combinations2Votes)
 
@@ -199,6 +206,7 @@ const VotingPage = () => {
 	const registerUser = async () => {
 		console.log(age,gender,country,region,ethnicity)
 		if (!age || !gender || !country || !region || !ethnicity) {
+			setAllInputError(true)
 			return
 		}
 		const resp = await userService.addUser(username,age,gender, country, region, ethnicity)
@@ -209,7 +217,7 @@ const VotingPage = () => {
 
 
 
-
+	console.log("age",age)
 
 	const registerDiv = () => {
 		return (
@@ -218,6 +226,7 @@ const VotingPage = () => {
 				<h3> Background Info </h3>
 				<div className = 'registerField'>
 					<h4> Gender: </h4>
+						{!genderDisabled &&
 					<RadioGroup onChange={ (val) => setGender(val) } horizontal>
 					  <RadioButton rootColor = {'black'}  pointColor = {'green'} value="male">
 					    Male
@@ -228,23 +237,45 @@ const VotingPage = () => {
 					  <RadioButton rootColor = {'black'} pointColor = {'green'} value="Other">
 					    Other
 					  </RadioButton>
-					</RadioGroup>
+					  
+					</RadioGroup>}
+					<div className = 'preferNotToSay'>
+					       <Toggle
+									id = 'ageToggle'
+								  defaultChecked={genderDisabled}
+								  onChange={()=> setGenderDisabled(!genderDisabled)} />
+								<label htmlFor = 'ageToggle' >Prefer Not To Say</label>
+								</div>
 
 
 				</div>
 				<div className = 'registerField'>
 					<h4> Age: </h4>
-					<Slider
+					
+						{!ageDisabled &&
+					  <Slider
 					                min={0}
 					                max={99}
 					                step={1}
 					                value={age? age : 21}
 					                onChange={value => setAge(+value)}
 
-					              />
+					              />}
+					       <div className = 'preferNotToSay'>
+					       <Toggle
+									id = 'ageToggle'
+								  defaultChecked={ageDisabled}
+								  onChange={()=> setAgeDisabled(!ageDisabled)} />
+								<label htmlFor = 'ageToggle' >Prefer Not To Say</label>
+								</div>
+					     
+							
+			
 				</div>
 				<div className = 'registerField'>
 				<h4> Current Address: Country and Region </h4>
+					{!countryDisabled &&
+						<>
 				<CountryDropdown
           value={country}
           onChange={(val) => setCountry(val)} />
@@ -252,12 +283,38 @@ const VotingPage = () => {
           country={country}
           value={region}
           onChange={(val) => setRegion(val)} />
+          </>}
+
+           <div className = 'preferNotToSay'>
+					       <Toggle
+									id = 'ageToggle'
+								  defaultChecked={countryDisabled}
+								  onChange={()=> {setCountryDisabled(!countryDisabled)}} />
+								<label htmlFor = 'ageToggle' >Prefer Not To Say</label>
+								</div>
+					     
         </div>
         <div className = 'registerField'>
         <h4> Ethnicity: </h4>
-				<Dropdown options={ethncities} onChange={(eth) => setEthnicity(eth.value)} value={defaultEthnicity} placeholder="Select an option" />
+        	{!ethnicityDisabled &&
+
+				<Dropdown options={ethnicities} onChange={(eth) => setEthnicity(eth.value)} value={defaultEthnicity} placeholder="Select an option" /> }
+				 <div className = 'preferNotToSay'>
+					       <Toggle
+									id = 'ageToggle'
+								  defaultChecked={ethnicityDisabled}
+								  onChange={()=> {setEthnicityDisabled(!ethnicityDisabled)}} />
+								<label htmlFor = 'ageToggle' >Prefer Not To Say</label>
+
+								
+					     
+        </div>
 				</div>
+				<div>
 				<button className = 'btn_primary' onClick = {registerUser} > Confirm </button>
+				{allInputError && <h4 className = 'error'> Not all fields entered. </h4>}
+				</div>
+
 				
 			</div>
 
