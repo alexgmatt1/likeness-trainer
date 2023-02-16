@@ -290,7 +290,7 @@ const VotingPage = () => {
 
 		let currentPair = votesToDo[pageIdx]
 		//let originalId = currentPair[0].split('_')[0]
-		let sketch = process.env.PUBLIC_URL + '/assets/Drawings (1)/' + currentPair[3]
+		let sketch = process.env.PUBLIC_URL + '/assets/output/' + currentPair[3]
 		let image1 = process.env.PUBLIC_URL + '/assets/FairFace/' + currentPair[0]
 		let image2 = process.env.PUBLIC_URL + '/assets/FairFace/' + currentPair[1]
 		let image3 = process.env.PUBLIC_URL + '/assets/FairFace/' + currentPair[2]
