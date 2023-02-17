@@ -30,7 +30,7 @@ const VotingPage = () => {
 	const {username, isRegistered, backgroundInfo} = useAppSelector(state=>state.user)
 	const [registeredInfo, setRegisteredInfo] = useState(backgroundInfo)
 	const [gender,setGender] = useState(null);
-	const [age,setAge] = useState(21)
+	const [age,setAge] = useState(null)
 	const [userVotes,setUserVotes] = useState(null)
 	const [votesToDo,setVotesToDo] = useState(null)
 	//const [newVotes, setNewVotes] = useState(null)
@@ -46,7 +46,7 @@ const VotingPage = () => {
 	const [saving, setSaving] = useState(false)
 	const [country, setCountry] = useState(null)
 	const [region, setRegion] = useState(null)
-	const [ethnicity, setEthnicity] = useState(ethnicities[0])
+	const [ethnicity, setEthnicity] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [id2pair,setId2Pair] = useState(null)
 
@@ -56,13 +56,18 @@ const VotingPage = () => {
 	const [ethnicityDisabled,setEthnicityDisabled] = useState(false)
 	const [allInputError,setAllInputError] = useState(false)
 
-	const defaultEthnicity = ethnicities[0];
+
+	const [alreadyVoted,setAlreadyVoted] = useState(false)
 
 	console.log("combinations2Votes",combinations2Votes)
 
 	const voteImage = (choice) => {
-		console.log("vote")
 		let currentPair = votesToDo[pageIdx]
+		let currentVote = combinations2Votes[currentPair.slice(-1)[0]]
+		currentVote != null && setAlreadyVoted(true)
+
+		console.log("vote")
+
 		setNewVotes(currentPair,currentPair[choice])
 		setLoading(true)
 		setTimeout(()=> {setPageIdx(Math.min(votesToDo.length - 1, pageIdx + 1)); setLoading(false)}, 500)
@@ -71,6 +76,15 @@ const VotingPage = () => {
 			setSavedText(false)
 		}
 	}
+
+	useEffect(() => {
+		if (!alreadyVoted) {
+			return
+		}
+		saveData()
+		setAlreadyVoted(false)
+
+	} , [alreadyVoted])
 
 	const saveData = () => {
 
@@ -205,7 +219,7 @@ const VotingPage = () => {
 
 	const registerUser = async () => {
 		console.log(age,gender,country,region,ethnicity)
-		if (!age || !gender || !country || !region || !ethnicity) {
+		if (!age && !ageDisabled || !gender && !genderDisabled || !country && !countryDisabled || !region && !countryDisabled || !ethnicity && !ethnicityDisabled) {
 			setAllInputError(true)
 			return
 		}
@@ -298,7 +312,7 @@ const VotingPage = () => {
         <h4> Ethnicity: </h4>
         	{!ethnicityDisabled &&
 
-				<Dropdown options={ethnicities} onChange={(eth) => setEthnicity(eth.value)} value={defaultEthnicity} placeholder="Select an option" /> }
+				<Dropdown options={ethnicities} onChange={(eth) => setEthnicity(eth.value)} value={ethnicity} placeholder="Select an option" /> }
 				 <div className = 'preferNotToSay'>
 					       <Toggle
 									id = 'ageToggle'
@@ -380,7 +394,7 @@ const VotingPage = () => {
 				<h4> Image 2 </h4>
 				</div>
 				<div className = {`imgDiv ${currentVote === currentPair[2] && "drawingSelected"}`} >
-				<img onClick = {()=> {voteImage(0)}} className = 'votingGrid__drawing' src = {image3}/>
+				<img onClick = {()=> {voteImage(2)}} className = 'votingGrid__drawing' src = {image3}/>
 				<h4> Image 3 </h4>
 				</div>
 

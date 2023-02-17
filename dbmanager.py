@@ -141,13 +141,13 @@ class DbManager:
     
     def user_exists(self, username):
         """ Checks if user already exists in database """
-        self.cursor.execute("SELECT age, gender, country, region, ethnicity FROM users WHERE username=%s LIMIT 1", (username, ))
+        self.cursor.execute("SELECT hasregistered FROM users WHERE username=%s LIMIT 1", (username, ))
         return self.cursor.fetchone()
     
     def update_details(self, username, age, gender, country, region, ethnicity):
         """ Update record on  """
 
-        self.cursor.execute("UPDATE users SET age=%s, gender = %s, country = %s, region = %s, ethnicity = %s WHERE username=%s",\
+        self.cursor.execute("UPDATE users SET age=%s, gender = %s, country = %s, region = %s, ethnicity = %s, hasregistered = True WHERE username=%s",\
             (age, gender, country, region, ethnicity, username))
         self.conn.commit()
        

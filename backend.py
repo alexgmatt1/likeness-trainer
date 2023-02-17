@@ -26,6 +26,14 @@ def hello():
 def test():
   return "Testing"
 
+def shuffle_images(row):
+ 
+  images = row[:3]
+  random.shuffle(images)
+
+  newRow = np.concatenate((images,[row[-1]]))
+  return newRow
+
 
 @app.route("/getImages", methods = ['POST'])
 @cross_origin()
@@ -50,11 +58,14 @@ def getImages():
       del idx2bucket[random_idx]
 
   df = df.iloc[final]
+  shuffled_array = df.to_numpy()
+  new = np.apply_along_axis(shuffle_images, 1, shuffled_array)
+  newdf = pd.DataFrame(new)
 
-  df['ID'] = df.apply(lambda x: "".join(sorted([fn.split('.')[0] for fn in x])), axis = 1)
+  newdf['ID'] = newdf.apply(lambda x: ",".join(sorted([fn.split('.')[0] for fn in x])), axis = 1)
 
-  print(df)
-  return jsonify({"images": list(df.itertuples(index=False))})
+  print(newdf)
+  return jsonify({"images": list(newdf.itertuples(index=False))})
 
 @app.route("/checkRegistered", methods = ['POST'])
 @cross_origin()
@@ -67,7 +78,7 @@ def checkRegistered():
     print(resp)
     if resp != None:
       registered = True
-      backgroundInfo = not (None in resp)
+      backgroundInfo = not (False in resp)
     else:
       registered = False
       backgroundInfo = False
@@ -95,7 +106,7 @@ def addUserInfo():
   country = form['country']
   region = form['region']
   ethnicity = form['ethnicity']
-  gender = form['gender'].capitalize()
+  gender = form['gender']
   with dbm(None) as db:
     db.update_details(username, age, gender, country, region, ethnicity)
   return jsonify({"success": True})
