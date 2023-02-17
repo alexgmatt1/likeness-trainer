@@ -62,6 +62,9 @@ const VotingPage = () => {
 	console.log("combinations2Votes",combinations2Votes)
 
 	const voteImage = (choice) => {
+		if (loading) {
+			return // prevents voting happening during cooldown, e.g with key buttons
+		}
 		let currentPair = votesToDo[pageIdx]
 		let currentVote = combinations2Votes[currentPair.slice(-1)[0]]
 		currentVote != null && setAlreadyVoted(true)
