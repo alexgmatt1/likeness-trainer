@@ -9,7 +9,7 @@ def get_cols(cur):
     return [x for (x,) in cur.fetchall()]
 
 def get_vote_df(cur):
-    cur.execute("select * from votes")
+    cur.execute("select * from votes where length(username) = 8")
     votes = cur.fetchall()
     cols = get_cols(cur)
     data = []
