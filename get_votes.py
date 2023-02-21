@@ -25,4 +25,5 @@ with psycopg2.connect(**LOGIN_KWARGS) as conn2:
     with conn2.cursor() as cur2:
         votes = get_vote_df(cur2)
 
-print(votes)
+if __name__ == "__main__":
+    print(votes)
