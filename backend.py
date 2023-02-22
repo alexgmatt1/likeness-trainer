@@ -4,6 +4,7 @@ from flask import jsonify, request, render_template
 from flask.helpers import send_from_directory
 from dbmanager import DbManager as dbm
 from flask_cors import CORS,cross_origin
+import numpy as np
 
 app = Flask(__name__, static_folder = 'frontend/build', static_url_path = '')
 CORS(app)
@@ -30,8 +31,9 @@ def test():
 def getImages():
   """ Returns json formatted list of image files {images: list(images)} """
   df = pd.read_csv("./frontend/public/assets/files.csv")
+  permutation = np.random.permutation(len(df))
   print(df)
-  return jsonify({"images": list(df.itertuples(index=False))})
+  return jsonify({"images": list(df.iloc[permutation].itertuples(index=False))})
 
 @app.route("/checkRegistered", methods = ['POST'])
 @cross_origin()

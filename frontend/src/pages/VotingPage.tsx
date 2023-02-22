@@ -352,10 +352,10 @@ const VotingPage = () => {
 		}
 
 		let currentPair = votesToDo[pageIdx]
-		let originalId = currentPair[0].split('_')[0]
+		let originalId = currentPair[0].split('-')[2]
 		let originalFile = process.env.PUBLIC_URL + '/assets/FairFace/' + originalId + '.jpg'
-		let drawing1 = process.env.PUBLIC_URL + '/assets/Drawings/' + currentPair[0]
-		let drawing2 = process.env.PUBLIC_URL + '/assets/Drawings/' + currentPair[1]
+		let drawing1 = process.env.PUBLIC_URL + '/assets/1008/output/' + currentPair[0]
+		let drawing2 = process.env.PUBLIC_URL + '/assets/1008/output/' + currentPair[1]
 
 		let currentVote = pairs2Votes[currentPair]
 		let drawing1_selected = currentVote === currentPair[0]
