@@ -46,7 +46,7 @@ def checkRegistered():
     print(resp)
     if resp != None:
       registered = True
-      backgroundInfo = not (None in resp)
+      backgroundInfo = not (False in resp)
     else:
       registered = False
       backgroundInfo = False
@@ -74,7 +74,7 @@ def addUserInfo():
   country = form['country']
   region = form['region']
   ethnicity = form['ethnicity']
-  gender = form['gender'].capitalize()
+  gender = form['gender']
   with dbm(None) as db:
     db.update_details(username, age, gender, country, region, ethnicity)
   return jsonify({"success": True})
