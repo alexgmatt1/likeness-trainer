@@ -1,3 +1,7 @@
+"""
+Utility code to read database connection details from login.json.
+"""
+
 import json
 
 FILENAME = "login.json"

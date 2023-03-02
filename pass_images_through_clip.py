@@ -1,3 +1,7 @@
+"""
+Pre-generates CLIP embeddings for images in the "output" directory and pickles the embeddings to "res.pkl".
+"""
+
 import torch
 import clip
 import os

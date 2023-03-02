@@ -1,3 +1,7 @@
+"""
+Utility code for taking in image of a face and writing coordinates of face to a CSV file for further processing.
+"""
+
 from imutils import face_utils
 import numpy as np
 import dlib

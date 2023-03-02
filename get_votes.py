@@ -1,3 +1,7 @@
+"""
+Downloads votes from the database and processes it into a Pandas DataFrame.
+"""
+
 import psycopg2
 import pandas as pd
 import datetime

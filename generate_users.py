@@ -1,3 +1,7 @@
+"""
+Run-once script to generate random user access codes and writes them to a database
+"""
+
 import random
 import psycopg2
 
